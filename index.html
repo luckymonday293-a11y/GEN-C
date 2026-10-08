@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GEN C — Banking built for clarity. Hold, send, receive and exchange money without the friction." />
+  <title>GEN C — Banking Built for Clarity</title>
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="assets/css/design-system.css" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #2563EB;
+      --blue-light:  #EFF6FF;
+      --blue-hover:  #1D4ED8;
+      --navy:        #0F172A;
+      --bg:          #F8FAFC;
+      --surface:     #FFFFFF;
+      --text:        #0F172A;
+      --muted:       #64748B;
+      --border:      #E2E8F0;
+      --success:     #16A34A;
+      --radius-sm:   8px;
+      --radius-md:   12px;
+      --radius-lg:   16px;
+      --radius-xl:   24px;
+      --shadow-sm:   0 1px 3px rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.06);
+      --shadow-md:   0 4px 16px rgba(15,23,42,.10), 0 2px 6px rgba(15,23,42,.06);
+      --shadow-lg:   0 12px 40px rgba(15,23,42,.14);
+      --transition:  150ms ease;
+      --font:        'Inter', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Skip Link ─────────────────────────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      background: var(--blue);
+      color: #fff;
+      padding: .5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: .875rem;
+      z-index: 9999;
+      text-decoration: none;
+      transition: top var(--transition);
+    }
+    .skip-link:focus { top: 1rem; }
+
+    /* ─── Typography helpers ─────────────────────────────────────────────── */
+    h1, h2, h3 { line-height: 1.2; letter-spacing: -.02em; font-weight: 700; }
+    h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; }
+    h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); }
+    h3 { font-size: 1.125rem; font-weight: 600; }
+    p  { color: var(--muted); }
+
+    /* ─── Container ──────────────────────────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin-inline: auto;
+      padding-inline: 1.5rem;
+    }
+
+    /* ─── Buttons ────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .625rem 1.375rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: .9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      text-decoration: none;
+      transition: background var(--transition), color var(--transition),
+                  border-color var(--transition), box-shadow var(--transition),
+                  transform var(--transition);
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .btn:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px;
+    }
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+    .btn-primary:hover { background: var(--blue-hover); border-color: var(--blue-hover); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--blue);
+      border-color: var(--blue);
+    }
+    .btn-outline:hover { background: var(--blue-light); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover { background: var(--bg); border-color: var(--muted); }
+
+    .btn-ghost-white {
+      background: transparent;
+      color: #fff;
+      border-color: rgba(255,255,255,.35);
+    }
+    .btn-ghost-white:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.6); }
+
+    .btn-lg {
+      padding: .8125rem 1.75rem;
+      font-size: 1rem;
+      border-radius: var(--radius-md);
+    }
+
+    /* ─── NAVIGATION ─────────────────────────────────────────────────────── */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    /* Logo */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      text-decoration: none;
+      color: var(--navy);
+    }
+    .nav-logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--blue);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: .875rem;
+      letter-spacing: -.03em;
+      flex-shrink: 0;
+    }
+    .nav-logo-text {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--navy);
+    }
+
+    /* Desktop links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: .9375rem;
+      font-weight: 500;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    /* Desktop action buttons */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    /* Hamburger */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 40px;
+      height: 40px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      transition: background var(--transition);
+    }
+    .nav-hamburger:hover { background: var(--bg); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform var(--transition), opacity var(--transition);
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* Mobile drawer */
+    .nav-drawer {
+      display: none;
+      position: fixed;
+      inset: 64px 0 0 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+      z-index: 99;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .nav-drawer.open { display: flex; }
+    .nav-drawer .nav-links {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+    .nav-drawer .nav-links li {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-drawer .nav-links a {
+      display: block;
+      padding: .875rem 0;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .nav-drawer .nav-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .nav-drawer .nav-actions .btn {
+      justify-content: center;
+      padding-block: .8125rem;
+    }
+
+    /* ─── HERO ───────────────────────────────────────────────────────────── */
+    .hero {
+      padding-block: 6rem 5rem;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--blue-light);
+      color: var(--blue);
+      font-size: .8125rem;
+      font-weight: 600;
+      padding: .375rem .875rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+      border: 1px solid #BFDBFE;
+    }
+    .hero-badge i { width: 14px; height: 14px; }
+
+    .hero-headline {
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+    .hero-headline .accent { color: var(--blue); }
+
+    .hero-sub {
+      font-size: 1.0625rem;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 2.25rem;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: .8125rem;
+    }
+    .hero-trust i { width: 15px; height: 15px; color: var(--success); flex-shrink: 0; }
+
+    /* ─── PRODUCT MOCKUP ─────────────────────────────────────────────────── */
+    .hero-visual {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .mockup-wrapper {
+      width: 100%;
+      max-width: 360px;
+      position: relative;
+    }
+
+    /* Subtle background accent */
+    .mockup-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -24px;
+      background: radial-gradient(ellipse at 60% 40%, #DBEAFE 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    .mockup-card {
+      position: relative;
+      z-index: 1;
+      background: var(--navy);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      color: #fff;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .mockup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+    }
+    .mockup-logo {
+      font-weight: 800;
+      font-size: .9375rem;
+      letter-spacing: -.03em;
+      color: #fff;
+    }
+    .mockup-logo span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--blue);
+      border-radius: 6px;
+      font-size: .75rem;
+      margin-right: .35rem;
+      vertical-align: middle;
+    }
+    .mockup-chip {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.7);
+      font-size: .6875rem;
+      font-weight: 500;
+      padding: .25rem .625rem;
+      border-radius: 100px;
+    }
+
+    .mockup-balance-label {
+      font-size: .75rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.55);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: .375rem;
+    }
+    .mockup-balance-amount {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: .375rem;
+    }
+    .mockup-balance-change {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      font-size: .75rem;
+      font-weight: 500;
+      color: #4ADE80;
+    }
+    .mockup-balance-change i { width: 12px; height: 12px; }
+
+    .mockup-actions {
+      display: flex;
+      gap: .75rem;
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .mockup-action-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .4rem;
+    }
+    .mockup-action-icon {
+      width: 42px;
+      height: 42px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: background var(--transition);
+    }
+    .mockup-action-icon i { width: 18px; height: 18px; }
+    .mockup-action-label {
+      font-size: .6875rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.6);
+    }
+
+    .mockup-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 1rem;
+    }
+
+    .mockup-tx-label {
+      font-size: .6875rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.4);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: .75rem;
+    }
+
+    .mockup-tx-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .625rem 0;
+    }
+    .mockup-tx-row + .mockup-tx-row {
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .mockup-tx-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .6875rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: -.01em;
+    }
+    .mockup-tx-info { flex: 1; min-width: 0; }
+    .mockup-tx-name {
+      font-size: .8125rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.9);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mockup-tx-time {
+      font-size: .6875rem;
+      color: rgba(255,255,255,.4);
+      margin-top: 1px;
+    }
+    .mockup-tx-amount {
+      font-size: .875rem;
+      font-weight: 700;
+    }
+    .mockup-tx-amount.debit  { color: #F87171; }
+    .mockup-tx-amount.credit { color: #4ADE80; }
+
+    /* USD pill below main card */
+    .mockup-secondary {
+      position: relative;
+      z-index: 1;
+      margin-top: .875rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+    .mockup-secondary-label {
+      font-size: .75rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .mockup-secondary-amount {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .mockup-secondary-badge {
+      background: #DCFCE7;
+      color: var(--success);
+      font-size: .6875rem;
+      font-weight: 600;
+      padding: .2rem .5rem;
+      border-radius: 100px;
+    }
+
+    /* ─── FEATURES ───────────────────────────────────────────────────────── */
+    .features {
+      padding-block: 5rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-eyebrow {
+      display: block;
+      font-size: .8125rem;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: .875rem;
+    }
+
+    .section-heading {
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1.0625rem;
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 3.5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .feature-card:hover {
+      border-color: #BFDBFE;
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--blue-light);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue);
+      margin-bottom: 1.25rem;
+    }
+    .feature-icon i { width: 22px; height: 22px; }
+
+    .feature-title {
+      color: var(--text);
+      margin-bottom: .5rem;
+    }
+
+    .feature-desc {
+      font-size: .9375rem;
+      line-height: 1.65;
+    }
+
+    /* ─── HOW IT WORKS ────────────────────────────────────────────────────── */
+    .how {
+      padding-block: 5rem;
+    }
+
+    .how-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .how-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: .5rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1.25rem;
+      padding-block: 1.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: .9375rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: .1rem;
+    }
+
+    .step-content h3 {
+      color: var(--text);
+      margin-bottom: .35rem;
+    }
+    .step-content p {
+      font-size: .9375rem;
+      line-height: 1.65;
+    }
+    .step-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: .5rem;
+      background: var(--bg);
+      padding: .25rem .625rem;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+    }
+    .step-meta i { width: 12px; height: 12px; }
+
+    .how-aside {
+      position: sticky;
+      top: 88px;
+    }
+
+    .how-callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .how-callout-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--blue);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+    .how-callout-icon i { width: 24px; height: 24px; }
+
+    .how-callout h3 {
+      font-size: 1.25rem;
+      margin-bottom: .75rem;
+    }
+
+    .how-callout p {
+      font-size: .9375rem;
+      line-height: 1.65;
+      margin-bottom: 1.75rem;
+    }
+
+    .how-checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+    .how-checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: .625rem;
+      font-size: .875rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .how-checklist i {
+      width: 16px;
+      height: 16px;
+      color: var(--success);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ─── CTA BANNER ─────────────────────────────────────────────────────── */
+    .cta-banner {
+      background: var(--navy);
+      padding-block: 5rem;
+    }
+
+    .cta-banner-inner {
+      text-align: center;
+      max-width: 600px;
+      margin-inline: auto;
+    }
+
+    .cta-banner h2 {
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .cta-banner p {
+      color: rgba(255,255,255,.6);
+      font-size: 1.0625rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    .cta-banner-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────────────── */
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding-block: 2.25rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+    .footer-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      text-decoration: none;
+    }
+    .footer-logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--blue);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: .75rem;
+      letter-spacing: -.02em;
+      flex-shrink: 0;
+    }
+    .footer-logo-text {
+      font-size: 1.0625rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--navy);
+    }
+    .footer-tagline {
+      font-size: .8125rem;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+
+    .footer-copy {
+      font-size: .8125rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .hero-inner  { gap: 2.5rem; }
+      .how-inner   { gap: 3rem; }
+    }
+
+    @media (max-width: 768px) {
+      /* Nav */
+      .nav-links,
+      .nav-actions { display: none; }
+      .nav-hamburger { display: flex; }
+
+      /* Hero */
+      .hero { padding-block: 4rem 3rem; }
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .hero-sub { max-width: 100%; }
+      .hero-visual { justify-content: center; }
+      .mockup-wrapper { max-width: 340px; }
+
+      /* Features */
+      .features-grid { grid-template-columns: 1fr; }
+
+      /* How */
+      .how-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .how-aside { position: static; }
+
+      /* Footer */
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .footer-copy  { text-align: left; }
+    }
+
+    @media (max-width: 480px) {
+      .mockup-balance-amount { font-size: 1.625rem; }
+      .cta-banner { padding-block: 3.5rem; }
+      .hero { padding-block: 3rem 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip Link -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- ══════════════════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════════════════ -->
+  <header class="site-nav" role="banner">
+    <div class="container nav-inner">
+
+      <!-- Logo -->
+      <a href="index.html" class="nav-logo" aria-label="GEN C Home">
+        <span class="nav-logo-mark" aria-hidden="true">GC</span>
+        <span class="nav-logo-text">GEN C</span>
+      </a>
+
+      <!-- Desktop Links -->
+      <nav aria-label="Primary navigation">
+        <ul class="nav-links" role="list">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How it works</a></li>
+        </ul>
+      </nav>
+
+      <!-- Desktop Actions -->
+      <div class="nav-actions" aria-label="Account actions">
+        <a href="login.html"  class="btn btn-outline">Log In</a>
+        <a href="signup.html" class="btn btn-primary">Get Started</a>
+      </div>
+
+      <!-- Hamburger (mobile) -->
+      <button
+        class="nav-hamburger"
+        id="nav-hamburger"
+        aria-controls="nav-drawer"
+        aria-expanded="false"
+        aria-label="Open navigation menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <nav aria-label="Mobile navigation">
+      <ul class="nav-links" role="list">
+        <li><a href="#features"     id="drawer-features">Features</a></li>
+        <li><a href="#how-it-works" id="drawer-how">How it works</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html"  class="btn btn-outline">Log In</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- ── HERO ─────────────────────────────────────────────────────────── -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container hero-inner">
+
+        <!-- Left: Copy -->
+        <div class="hero-copy">
+          <div class="hero-badge" aria-hidden="true">
+            <i data-lucide="shield-check"></i>
+            Secure & regulated
+          </div>
+
+          <h1 class="hero-headline" id="hero-heading">
+            Banking built<br />
+            for <span class="accent">clarity.</span>
+          </h1>
+
+          <p class="hero-sub">
+            Hold, send, receive and exchange money — without the friction.
+            GEN C gives you control over your money in one clean experience.
+          </p>
+
+          <div class="hero-ctas">
+            <a href="signup.html" class="btn btn-primary btn-lg">
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              Get Started
+            </a>
+            <a href="login.html" class="btn btn-ghost btn-lg">
+              Log In
+            </a>
+          </div>
+
+          <div class="hero-trust" aria-label="Security assurance">
+            <i data-lucide="lock"></i>
+            <span>256-bit encryption &nbsp;·&nbsp; No hidden fees &nbsp;·&nbsp; Built for Nigerians</span>
+          </div>
+        </div>
+
+        <!-- Right: Product Mockup -->
+        <div class="hero-visual" aria-label="GEN C app preview" role="img">
+          <div class="mockup-wrapper">
+
+            <!-- Main Balance Card -->
+            <div class="mockup-card">
+              <!-- Card Header -->
+              <div class="mockup-header">
+                <span class="mockup-logo">
+                  <span aria-hidden="true">GC</span>GEN C
+                </span>
+                <span class="mockup-chip">NGN Wallet</span>
+              </div>
+
+              <!-- Balance -->
+              <div>
+                <div class="mockup-balance-label">Total Balance</div>
+                <div class="mockup-balance-amount" aria-label="₦250,000.00">₦250,000.00</div>
+                <div class="mockup-balance-change" aria-hidden="true">
+                  <i data-lucide="trending-up"></i>
+                  +₦15,000 today
+                </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="mockup-actions" role="list" aria-label="Quick actions">
+                <div class="mockup-action-btn" role="listitem">
+                  <div class="mockup-action-icon">
+                    <i data-lucide="plus"></i>
+                  </div>
+                  <span class="mockup-action-label">Fund</span>
+                </div>
+                <div class="mockup-action-btn" role="listitem">
+                  <div class="mockup-action-icon">
+                    <i data-lucide="send"></i>
+                  </div>
+                  <span class="mockup-action-label">Send</span>
+                </div>
+                <div class="mockup-action-btn" role="listitem">
+                  <div class="mockup-action-icon">
+                    <i data-lucide="download"></i>
+                  </div>
+                  <span class="mockup-action-label">Receive</span>
+                </div>
+                <div class="mockup-action-btn" role="listitem">
+                  <div class="mockup-action-icon">
+                    <i data-lucide="refresh-cw"></i>
+                  </div>
+                  <span class="mockup-action-label">Exchange</span>
+                </div>
+              </div>
+
+              <!-- Transactions -->
+              <hr class="mockup-divider" />
+              <div class="mockup-tx-label">Recent Activity</div>
+
+              <div class="mockup-tx-row">
+                <div class="mockup-tx-avatar" aria-hidden="true">AJ</div>
+                <div class="mockup-tx-info">
+                  <div class="mockup-tx-name">Ada Johnson</div>
+                  <div class="mockup-tx-time">Today, 2:14 PM</div>
+                </div>
+                <div class="mockup-tx-amount credit" aria-label="Received ₦15,000.00">+₦15,000</div>
+              </div>
+
+              <div class="mockup-tx-row">
+                <div class="mockup-tx-avatar" aria-hidden="true">KE</div>
+                <div class="mockup-tx-info">
+                  <div class="mockup-tx-name">Kemi Eze</div>
+                  <div class="mockup-tx-time">Yesterday, 9:41 AM</div>
+                </div>
+                <div class="mockup-tx-amount debit" aria-label="Sent ₦8,500.00">−₦8,500</div>
+              </div>
+            </div>
+
+            <!-- Secondary: USD Balance -->
+            <div class="mockup-secondary" aria-label="USD wallet balance">
+              <div>
+                <div class="mockup-secondary-label">USD Wallet</div>
+                <div class="mockup-secondary-amount">$320.00</div>
+              </div>
+              <span class="mockup-secondary-badge">Active</span>
+            </div>
+
+          </div>
+        </div>
+        <!-- /hero-visual -->
+
+      </div>
+    </section>
+    <!-- /hero -->
+
+    <!-- ── FEATURES ──────────────────────────────────────────────────────── -->
+    <section class="features" id="features" aria-labelledby="features-heading">
+      <div class="container">
+
+        <span class="section-eyebrow">What we offer</span>
+        <h2 class="section-heading" id="features-heading">Everything you need.<br />Nothing you don't.</h2>
+        <p class="section-sub">
+          GEN C strips away the complexity of traditional banking so you can focus
+          on what matters — your money.
+        </p>
+
+        <div class="features-grid">
+
+          <!-- Feature 1: Hold -->
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <i data-lucide="wallet"></i>
+            </div>
+            <h3 class="feature-title">Your balances, clearly.</h3>
+            <p class="feature-desc">
+              View your NGN and USD balances in one unified dashboard.
+              No switching apps, no confusion — just your money, at a glance.
+            </p>
+          </article>
+
+          <!-- Feature 2: Send & Receive -->
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <i data-lucide="arrow-left-right"></i>
+            </div>
+            <h3 class="feature-title">Move money simply.</h3>
+            <p class="feature-desc">
+              Send to any GEN C user instantly, or transfer to any Nigerian
+              bank account. Receiving is just as effortless.
+            </p>
+          </article>
+
+          <!-- Feature 3: Exchange -->
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <i data-lucide="refresh-cw"></i>
+            </div>
+            <h3 class="feature-title">Exchange when you need to.</h3>
+            <p class="feature-desc">
+              Convert between NGN and USD at transparent rates. No hidden
+              spreads, no surprise charges — just straightforward exchange.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+    <!-- /features -->
+
+    <!-- ── HOW IT WORKS ──────────────────────────────────────────────────── -->
+    <section class="how" id="how-it-works" aria-labelledby="how-heading">
+      <div class="container how-inner">
+
+        <!-- Steps -->
+        <div>
+          <span class="section-eyebrow">How it works</span>
+          <h2 class="section-heading" id="how-heading">Up and running<br />in minutes.</h2>
+          <p class="section-sub" style="margin-bottom:0;">
+            We built GEN C to remove every unnecessary step between you and your money.
+          </p>
+
+          <ol class="how-steps" aria-label="Steps to get started">
+
+            <li class="step">
+              <div class="step-number" aria-hidden="true">1</div>
+              <div class="step-content">
+                <h3>Create your account</h3>
+                <p>Sign up with your email, set a password and verify your identity. The whole process takes under 60 seconds.</p>
+                <span class="step-meta">
+                  <i data-lucide="clock" aria-hidden="true"></i>
+                  60 seconds to sign up
+                </span>
+              </div>
+            </li>
+
+            <li class="step">
+              <div class="step-number" aria-hidden="true">2</div>
+              <div class="step-content">
+                <h3>Fund your wallet</h3>
+                <p>Add money to your NGN or USD wallet via bank transfer or card. Funds reflect instantly.</p>
+                <span class="step-meta">
+                  <i data-lucide="zap" aria-hidden="true"></i>
+                  Instant funding
+                </span>
+              </div>
+            </li>
+
+            <li class="step">
+              <div class="step-number" aria-hidden="true">3</div>
+              <div class="step-content">
+                <h3>Start transacting</h3>
+                <p>Send money to friends, receive payments, or exchange currencies — all from one clean interface.</p>
+                <span class="step-meta">
+                  <i data-lucide="check-circle" aria-hidden="true"></i>
+                  No learning curve
+                </span>
+              </div>
+            </li>
+
+          </ol>
+        </div>
+
+        <!-- Callout aside -->
+        <aside class="how-aside" aria-label="Why GEN C">
+          <div class="how-callout">
+            <div class="how-callout-icon" aria-hidden="true">
+              <i data-lucide="shield"></i>
+            </div>
+            <h3>Why GEN C?</h3>
+            <p>
+              We built GEN C because banking in Nigeria should be simple. Not just
+              another app — a genuinely better experience.
+            </p>
+            <ul class="how-checklist" aria-label="GEN C benefits">
+              <li>
+                <i data-lucide="check-circle" aria-hidden="true"></i>
+                No confusing fees or surprise charges
+              </li>
+              <li>
+                <i data-lucide="check-circle" aria-hidden="true"></i>
+                NGN &amp; USD wallets in one place
+              </li>
+              <li>
+                <i data-lucide="check-circle" aria-hidden="true"></i>
+                Instant GEN C-to-GEN C transfers
+              </li>
+              <li>
+                <i data-lucide="check-circle" aria-hidden="true"></i>
+                Real-time balance and transaction updates
+              </li>
+              <li>
+                <i data-lucide="check-circle" aria-hidden="true"></i>
+                Secure by design — 256-bit encryption
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+    <!-- /how-it-works -->
+
+    <!-- ── CTA BANNER ────────────────────────────────────────────────────── -->
+    <section class="cta-banner" aria-labelledby="cta-heading">
+      <div class="container cta-banner-inner">
+        <h2 id="cta-heading">Ready to get started?</h2>
+        <p>
+          Join thousands of Nigerians who already manage their money
+          with clarity. It only takes a minute.
+        </p>
+        <div class="cta-banner-actions">
+          <a href="signup.html" class="btn btn-primary btn-lg">
+            <i data-lucide="arrow-right" aria-hidden="true"></i>
+            Create Your Account
+          </a>
+          <a href="login.html" class="btn btn-ghost-white btn-lg">
+            I already have an account
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- /cta-banner -->
+
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-inner">
+
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo" aria-label="GEN C Home">
+          <span class="footer-logo-mark" aria-hidden="true">GC</span>
+          <span class="footer-logo-text">GEN C</span>
+        </a>
+        <p class="footer-tagline">Banking built for clarity.</p>
+      </div>
+
+      <p class="footer-copy">
+        &copy; 2026 GEN C. All rights reserved.
+      </p>
+
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════
+       SCRIPTS
+  ══════════════════════════════════════════════════ -->
+  <script>
+    // ── Mobile nav drawer ──────────────────────────────────────────────────
+    (function () {
+      const hamburger = document.getElementById('nav-hamburger');
+      const drawer    = document.getElementById('nav-drawer');
+
+      function openDrawer() {
+        drawer.classList.add('open');
+        hamburger.setAttribute('aria-expanded', 'true');
+        hamburger.setAttribute('aria-label', 'Close navigation menu');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.setAttribute('aria-label', 'Open navigation menu');
+        document.body.style.overflow = '';
+      }
+
+      hamburger.addEventListener('click', function () {
+        const isOpen = drawer.classList.contains('open');
+        isOpen ? closeDrawer() : openDrawer();
+      });
+
+      // Close on drawer link click
+      drawer.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeDrawer);
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) {
+          closeDrawer();
+          hamburger.focus();
+        }
+      });
+
+      // Close if viewport is resized to desktop
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 768 && drawer.classList.contains('open')) {
+          closeDrawer();
+        }
+      });
+    }());
+  </script>
+
+  <!-- Lucide Icons — must come after DOM -->
+  <script>
+    lucide.createIcons();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transactions — GEN C</title>
+  <link rel="stylesheet" href="assets/css/design-system.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ── App Shell Layout ─────────────────────────────────── */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg);
+    }
+
+    /* ── Sidebar ──────────────────────────────────────────── */
+    .sidebar {
+      width: 256px;
+      flex-shrink: 0;
+      background: var(--color-dark-navy);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 100;
+      overflow-y: auto;
+      transition: transform var(--transition-normal);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-6) var(--space-6) var(--space-4);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-mark svg { color: #fff; }
+
+    .logo-text {
+      font-size: var(--font-size-lg);
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-text span { color: var(--color-primary); }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: var(--space-4) var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .nav-section-label {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: var(--space-3) var(--space-3) var(--space-1);
+      margin-top: var(--space-2);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0.625rem var(--space-3);
+      border-radius: var(--radius-md);
+      color: rgba(255,255,255,0.6);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      text-decoration: none;
+      transition: background var(--transition-fast), color var(--transition-fast);
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+    }
+
+    .nav-item.active {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .nav-item.active:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .nav-item [data-lucide] {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: var(--space-4) var(--space-3);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      transition: background var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .sidebar-user:hover { background: rgba(255,255,255,0.07); }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: var(--font-size-sm);
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .user-info { min-width: 0; flex: 1; }
+
+    .user-name {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-email {
+      font-size: var(--font-size-xs);
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Main Content ─────────────────────────────────────── */
+    .main-content {
+      margin-left: 256px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── Top Header (mobile) ──────────────────────────────── */
+    .top-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .hamburger {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+    }
+
+    .header-logo {
+      font-size: var(--font-size-lg);
+      font-weight: 800;
+      color: var(--color-dark-navy);
+      letter-spacing: -0.02em;
+    }
+    .header-logo span { color: var(--color-primary); }
+
+    .header-actions { display: flex; gap: var(--space-2); align-items: center; }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      color: var(--color-muted);
+      display: flex;
+      align-items: center;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .icon-btn:hover { background: var(--color-bg); color: var(--color-text); }
+
+    /* ── Page Body ────────────────────────────────────────── */
+    .page-body {
+      padding: var(--space-8);
+      flex: 1;
+      max-width: 1080px;
+      width: 100%;
+    }
+
+    /* ── Page Header ──────────────────────────────────────── */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .page-header-text h1 {
+      font-size: var(--font-size-3xl);
+      font-weight: 800;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .page-header-text p {
+      margin-top: var(--space-1);
+      font-size: var(--font-size-base);
+      color: var(--color-muted);
+    }
+
+    .btn-outline-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.4rem var(--space-4);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      font-family: var(--font-family);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+      text-decoration: none;
+    }
+    .btn-outline-sm:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      text-decoration: none;
+    }
+    .btn-outline-sm [data-lucide] { width: 15px; height: 15px; }
+
+    /* ── Filter Bar ───────────────────────────────────────── */
+    .filter-bar {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-6);
+      display: flex;
+      gap: var(--space-4);
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-wrapper [data-lucide] {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-muted);
+      width: 18px;
+      height: 18px;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 16px 0 40px;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      background: var(--color-bg);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .search-input:focus {
+      border-color: var(--color-primary);
+      background: var(--color-surface);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .filter-select {
+      height: 40px;
+      padding: 0 36px 0 12px;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      background: var(--color-bg) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>') no-repeat right 12px center;
+      appearance: none;
+      cursor: pointer;
+      min-width: 130px;
+    }
+
+    .filter-select:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .date-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .date-input {
+      height: 40px;
+      padding: 0 12px;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      background: var(--color-bg);
+      cursor: pointer;
+    }
+
+    /* ── Summary Stats ────────────────────────────────────── */
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .stat-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--color-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-amount {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+    }
+
+    .stat-amount.in { color: var(--color-success); }
+    .stat-amount.out { color: var(--color-error); }
+    .stat-amount.net { color: var(--color-primary); }
+
+    /* ── Transactions List ────────────────────────────────── */
+    .transactions-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-6);
+    }
+
+    .tx-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tx-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      transition: background var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .tx-item:last-child {
+      border-bottom: none;
+    }
+
+    .tx-item:hover {
+      background: var(--color-bg);
+    }
+
+    .tx-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .tx-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .tx-icon.credit { background: var(--color-success-light); color: var(--color-success); }
+    .tx-icon.debit { background: var(--color-error-light); color: var(--color-error); }
+    .tx-icon.pending { background: #FFFBEB; color: var(--color-warning); }
+
+    .tx-icon [data-lucide] { width: 20px; height: 20px; }
+
+    .tx-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tx-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .tx-category {
+      font-size: var(--font-size-sm);
+      color: var(--color-muted);
+    }
+
+    .tx-reference {
+      font-size: 11px;
+      color: var(--color-muted);
+      opacity: 0.7;
+    }
+
+    .tx-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      text-align: right;
+    }
+
+    .tx-amount {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+    }
+
+    .tx-amount.credit { color: var(--color-success); }
+    .tx-amount.debit { color: var(--color-text); }
+    .tx-amount.failed { color: var(--color-error); text-decoration: line-through; }
+
+    .tx-date {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge.success { background: var(--color-success-light); color: var(--color-success); }
+    .badge.pending { background: #FFFBEB; color: var(--color-warning); }
+    .badge.failed { background: var(--color-error-light); color: var(--color-error); }
+
+    /* ── Pagination ───────────────────────────────────────── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .pagination-text {
+      font-size: var(--font-size-sm);
+      color: var(--color-muted);
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .pagination-btn {
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      color: var(--color-text);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .pagination-btn:disabled {
+      color: var(--color-muted);
+      background: var(--color-bg);
+      cursor: not-allowed;
+    }
+
+    /* ── Transaction Detail Drawer ────────────────────────── */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--transition-normal);
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: 100%;
+      max-width: 440px;
+      background: var(--color-surface);
+      z-index: 210;
+      transform: translateX(100%);
+      transition: transform var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.1);
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .drawer-title {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-muted);
+      padding: var(--space-2);
+      border-radius: var(--radius-full);
+      transition: background var(--transition-fast);
+      display: flex;
+    }
+
+    .close-btn:hover {
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    .drawer-body {
+      padding: var(--space-6) var(--space-5);
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .drawer-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .drawer-icon.credit { background: var(--color-success-light); color: var(--color-success); }
+    .drawer-icon.debit { background: var(--color-error-light); color: var(--color-error); }
+    .drawer-icon.pending { background: #FFFBEB; color: var(--color-warning); }
+    .drawer-icon [data-lucide] { width: 32px; height: 32px; }
+
+    .drawer-amount {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-text);
+      margin-bottom: var(--space-3);
+    }
+
+    .drawer-badge {
+      margin-bottom: var(--space-6);
+    }
+
+    .drawer-details {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-6);
+    }
+
+    .drawer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: var(--font-size-sm);
+    }
+
+    .drawer-label {
+      color: var(--color-muted);
+      font-weight: 500;
+    }
+
+    .drawer-value {
+      color: var(--color-text);
+      font-weight: 600;
+      text-align: right;
+      max-width: 60%;
+    }
+
+    /* ── Bottom Nav (mobile) ──────────────────────────────── */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-2) 0 calc(var(--space-2) + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+
+    .bottom-nav-inner {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      color: var(--color-muted);
+      font-size: 10px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color var(--transition-fast);
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .bottom-nav-item.active { color: var(--color-primary); }
+
+    .bottom-nav-item [data-lucide] { width: 22px; height: 22px; }
+
+    /* ── Sidebar Overlay ──────────────────────────────────── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 90;
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.open { display: block; }
+
+      .main-content { margin-left: 0; }
+
+      .top-header { display: flex; }
+
+      .page-body {
+        padding: var(--space-5);
+        padding-bottom: calc(80px + var(--space-4));
+      }
+
+      .summary-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .date-wrapper {
+        flex-direction: column;
+      }
+
+      .drawer {
+        max-width: 100%;
+        top: auto;
+        bottom: 0;
+        height: auto;
+        max-height: 90vh;
+        border-top-left-radius: var(--radius-xl);
+        border-top-right-radius: var(--radius-xl);
+        transform: translateY(100%);
+      }
+
+      .drawer.open {
+        transform: translateY(0);
+      }
+
+      .bottom-nav { display: block; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ── Sidebar ──────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-mark" aria-hidden="true">
+        <svg data-lucide="zap" width="20" height="20"></svg>
+      </div>
+      <span class="logo-text">GEN <span>C</span></span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="sidebar-nav" aria-label="App navigation">
+      <span class="nav-section-label">Main</span>
+
+      <a href="dashboard.html" class="nav-item">
+        <svg data-lucide="layout-dashboard" aria-hidden="true"></svg>
+        Dashboard
+      </a>
+
+      <a href="accounts.html" class="nav-item">
+        <svg data-lucide="wallet" aria-hidden="true"></svg>
+        Accounts
+      </a>
+
+      <a href="transactions.html" class="nav-item active" aria-current="page">
+        <svg data-lucide="receipt" aria-hidden="true"></svg>
+        Transactions
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg data-lucide="send" aria-hidden="true"></svg>
+        Send Money
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg data-lucide="arrow-down-to-line" aria-hidden="true"></svg>
+        Receive
+      </a>
+
+      <span class="nav-section-label">Finance</span>
+
+      <a href="#" class="nav-item">
+        <svg data-lucide="arrow-left-right" aria-hidden="true"></svg>
+        Exchange
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg data-lucide="piggy-bank" aria-hidden="true"></svg>
+        Savings
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg data-lucide="bar-chart-2" aria-hidden="true"></svg>
+        Analytics
+      </a>
+
+      <span class="nav-section-label">Other</span>
+
+      <a href="#" class="nav-item">
+        <svg data-lucide="bell" aria-hidden="true"></svg>
+        Notifications
+        <span class="nav-badge">3</span>
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg data-lucide="settings" aria-hidden="true"></svg>
+        Settings
+      </a>
+    </nav>
+
+    <!-- User -->
+    <div class="sidebar-footer">
+      <div class="sidebar-user" role="button" tabindex="0">
+        <div class="user-avatar" aria-hidden="true">LW</div>
+        <div class="user-info">
+          <div class="user-name">Lucky Weng</div>
+          <div class="user-email">lucky@genc.finance</div>
+        </div>
+        <svg data-lucide="chevron-up-down" width="14" height="14" style="color:rgba(255,255,255,0.4);"></svg>
+      </div>
+
+      <a href="index.html" class="nav-item" style="color:rgba(255,255,255,0.5);">
+        <svg data-lucide="log-out" aria-hidden="true"></svg>
+        Sign Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <div class="main-content">
+
+    <!-- Mobile Top Header -->
+    <header class="top-header">
+      <button class="hamburger" id="menuToggle" aria-label="Open navigation menu">
+        <svg data-lucide="menu" width="22" height="22"></svg>
+      </button>
+      <span class="header-logo">GEN <span>C</span></span>
+      <div class="header-actions">
+        <button class="icon-btn" aria-label="Notifications">
+          <svg data-lucide="bell" width="20" height="20"></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <main class="page-body">
+
+      <!-- Page Header -->
+      <header class="page-header">
+        <div class="page-header-text">
+          <h1>Transactions</h1>
+          <p>Your complete transaction history</p>
+        </div>
+        <button class="btn-outline-sm" aria-label="Export transactions">
+          <svg data-lucide="download"></svg>
+          Export
+        </button>
+      </header>
+
+      <!-- ── Filter Bar ───────────────────────────────────────── -->
+      <div class="filter-bar">
+        <div class="search-wrapper">
+          <svg data-lucide="search"></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search transactions..." />
+        </div>
+        <select class="filter-select" id="typeFilter" aria-label="Filter by type">
+          <option value="all">All Types</option>
+          <option value="credit">Credit</option>
+          <option value="debit">Debit</option>
+        </select>
+        <select class="filter-select" id="statusFilter" aria-label="Filter by status">
+          <option value="all">All Status</option>
+          <option value="successful">Successful</option>
+          <option value="pending">Pending</option>
+          <option value="failed">Failed</option>
+        </select>
+        <div class="date-wrapper">
+          <input type="date" class="date-input" aria-label="Start date" />
+          <span style="color:var(--color-muted); font-size:12px;">to</span>
+          <input type="date" class="date-input" aria-label="End date" />
+        </div>
+      </div>
+
+      <!-- ── Summary Stats ────────────────────────────────────── -->
+      <div class="summary-stats">
+        <div class="stat-box">
+          <span class="stat-label">Total In</span>
+          <span class="stat-amount in">₦225,000.00</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Total Out</span>
+          <span class="stat-amount out">₦120,700.00</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Net</span>
+          <span class="stat-amount net">+₦104,300.00</span>
+        </div>
+      </div>
+
+      <!-- ── Transactions List ────────────────────────────────── -->
+      <div class="transactions-card">
+        <div class="tx-list" id="transactionList">
+          <!-- Populated via JS -->
+        </div>
+        <div class="pagination">
+          <span class="pagination-text" id="paginationText">Showing 1–15 of 15 transactions</span>
+          <div class="pagination-controls">
+            <button class="pagination-btn" disabled>Previous</button>
+            <button class="pagination-btn" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a href="dashboard.html" class="bottom-nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          Home
+        </a>
+        <a href="accounts.html" class="bottom-nav-item">
+          <svg data-lucide="wallet"></svg>
+          Accounts
+        </a>
+        <a href="transactions.html" class="bottom-nav-item active">
+          <svg data-lucide="receipt"></svg>
+          History
+        </a>
+        <a href="#" class="bottom-nav-item">
+          <svg data-lucide="send"></svg>
+          Send
+        </a>
+        <a href="#" class="bottom-nav-item">
+          <svg data-lucide="settings"></svg>
+          Settings
+        </a>
+      </div>
+    </nav>
+
+  </div>
+</div>
+
+<!-- ── Transaction Detail Drawer ────────────────────────── -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="txDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+  <div class="drawer-header">
+    <h2 class="drawer-title" id="drawerTitle">Transaction Details</h2>
+    <button class="close-btn" id="closeDrawer" aria-label="Close details">
+      <svg data-lucide="x"></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawerBody">
+    <!-- Populated via JS -->
+  </div>
+</div>
+
+<script>
+  // Init Lucide
+  lucide.createIcons();
+
+  // Mobile sidebar toggle
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+
+  // Drawer logic
+  const txDrawer = document.getElementById('txDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const closeDrawer = document.getElementById('closeDrawer');
+  const drawerBody = document.getElementById('drawerBody');
+
+  function openDrawer(tx) {
+    // Determine styles based on status and type
+    let iconClass = 'credit';
+    let iconName = 'arrow-down-to-line';
+    if (tx.type === 'debit') {
+      iconClass = 'debit';
+      iconName = 'arrow-up-from-line';
+    }
+    if (tx.status === 'pending') {
+      iconClass = 'pending';
+      iconName = 'clock';
+    }
+
+    let statusBadgeClass = 'success';
+    if (tx.status === 'pending') statusBadgeClass = 'pending';
+    if (tx.status === 'failed') statusBadgeClass = 'failed';
+
+    let amountColor = tx.type === 'credit' ? 'var(--color-success)' : 'var(--color-text)';
+    let amountDisplay = tx.type === 'credit' ? tx.amount : '-' + tx.amount;
+    if (tx.status === 'failed') {
+      amountColor = 'var(--color-error)';
+      amountDisplay = tx.amount; // red and strikethrough handled by class if we wanted, but in detail view just red is fine
+    }
+
+    const html = `
+      <div class="drawer-icon ${iconClass}">
+        <i data-lucide="${iconName}"></i>
+      </div>
+      <div class="drawer-amount" style="color: ${amountColor}">${amountDisplay}</div>
+      <div class="drawer-badge badge ${statusBadgeClass}">
+        ${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
+      </div>
+      
+      <div class="drawer-details">
+        <div class="drawer-row">
+          <span class="drawer-label">Reference</span>
+          <span class="drawer-value">${tx.reference}</span>
+        </div>
+        <div class="drawer-row">
+          <span class="drawer-label">Date & Time</span>
+          <span class="drawer-value">${tx.date} · ${tx.time}</span>
+        </div>
+        <div class="drawer-row">
+          <span class="drawer-label">Type</span>
+          <span class="drawer-value">${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</span>
+        </div>
+        <div class="drawer-row">
+          <span class="drawer-label">Category</span>
+          <span class="drawer-value">${tx.category}</span>
+        </div>
+        <div class="drawer-row">
+          <span class="drawer-label">${tx.type === 'credit' ? 'From' : 'To'}</span>
+          <span class="drawer-value">${tx.name}</span>
+        </div>
+        <div class="drawer-row">
+          <span class="drawer-label">Fee</span>
+          <span class="drawer-value">₦50.00</span>
+        </div>
+        <div class="drawer-row">
+          <span class="drawer-label">Note</span>
+          <span class="drawer-value">N/A</span>
+        </div>
+      </div>
+    `;
+
+    drawerBody.innerHTML = html;
+    lucide.createIcons();
+    txDrawer.classList.add('open');
+    drawerOverlay.classList.add('open');
+  }
+
+  function closeTxDrawer() {
+    txDrawer.classList.remove('open');
+    drawerOverlay.classList.remove('open');
+  }
+
+  closeDrawer.addEventListener('click', closeTxDrawer);
+  drawerOverlay.addEventListener('click', closeTxDrawer);
+
+  // Transactions Data
+  const transactions = [
+    { id: 1, type: 'credit', name: 'Amara Okafor', category: 'GEN C Transfer', date: 'Oct 8, 2026', time: '14:34', amount: '₦50,000.00', status: 'successful', reference: 'GC-20261008-829374' },
+    { id: 2, type: 'debit', name: 'Bolt', category: 'Transport', date: 'Oct 8, 2026', time: '11:20', amount: '₦3,200.00', status: 'successful', reference: 'GC-20261008-283471' },
+    { id: 3, type: 'debit', name: 'Zara Online', category: 'Shopping', date: 'Oct 7, 2026', time: '19:45', amount: '₦12,500.00', status: 'successful', reference: 'GC-20261007-992384' },
+    { id: 4, type: 'debit', name: 'Kwik Delivery', category: 'Logistics', date: 'Oct 6, 2026', time: '09:15', amount: '₦5,000.00', status: 'pending', reference: 'GC-20261006-273645' },
+    { id: 5, type: 'credit', name: 'USD Deposit', category: 'Wallet Funding', date: 'Oct 5, 2026', time: '16:00', amount: '$100.00', status: 'successful', reference: 'GC-20261005-182374' },
+    { id: 6, type: 'debit', name: 'Chibuike Eze', category: 'GEN C Transfer', date: 'Oct 4, 2026', time: '13:30', amount: '₦30,000.00', status: 'successful', reference: 'GC-20261004-746352' },
+    { id: 7, type: 'credit', name: 'Salary — October', category: 'Payroll', date: 'Oct 1, 2026', time: '08:00', amount: '₦150,000.00', status: 'successful', reference: 'GC-20261001-987463' },
+    { id: 8, type: 'debit', name: 'Shoprite', category: 'Groceries', date: 'Sep 30, 2026', time: '17:20', amount: '₦8,750.00', status: 'successful', reference: 'GC-20260930-847563' },
+    { id: 9, type: 'debit', name: 'DSTV Subscription', category: 'Bills', date: 'Sep 30, 2026', time: '10:00', amount: '₦10,500.00', status: 'successful', reference: 'GC-20260930-746352' },
+    { id: 10, type: 'credit', name: 'Ngozi Adeyemi', category: 'GEN C Transfer', date: 'Sep 29, 2026', time: '14:10', amount: '₦25,000.00', status: 'successful', reference: 'GC-20260929-283746' },
+    { id: 11, type: 'debit', name: 'Jumia', category: 'Shopping', date: 'Sep 28, 2026', time: '20:30', amount: '₦15,200.00', status: 'successful', reference: 'GC-20260928-837465' },
+    { id: 12, type: 'debit', name: 'Gokada', category: 'Transport', date: 'Sep 27, 2026', time: '08:45', amount: '₦1,800.00', status: 'successful', reference: 'GC-20260927-463728' },
+    { id: 13, type: 'credit', name: 'Freelance Payment', category: 'Wallet Funding', date: 'Sep 26, 2026', time: '11:00', amount: '$200.00', status: 'successful', reference: 'GC-20260926-283746' },
+    { id: 14, type: 'debit', name: 'MTN Airtime', category: 'Bills', date: 'Sep 25, 2026', time: '09:30', amount: '₦2,000.00', status: 'successful', reference: 'GC-20260925-384756' },
+    { id: 15, type: 'debit', name: 'Ola Emmanuel', category: 'GEN C Transfer', date: 'Sep 24, 2026', time: '16:50', amount: '₦20,000.00', status: 'failed', reference: 'GC-20260924-182736' }
+  ];
+
+  const txListEl = document.getElementById('transactionList');
+  const searchInput = document.getElementById('searchInput');
+  const typeFilter = document.getElementById('typeFilter');
+  const statusFilter = document.getElementById('statusFilter');
+
+  function renderTransactions() {
+    const term = searchInput.value.toLowerCase();
+    const type = typeFilter.value;
+    const status = statusFilter.value;
+
+    const filtered = transactions.filter(tx => {
+      const matchSearch = tx.name.toLowerCase().includes(term);
+      const matchType = type === 'all' || tx.type === type;
+      const matchStatus = status === 'all' || tx.status === status;
+      return matchSearch && matchType && matchStatus;
+    });
+
+    txListEl.innerHTML = '';
+
+    if (filtered.length === 0) {
+      txListEl.innerHTML = `
+        <div style="padding: 40px; text-align: center; color: var(--color-muted);">
+          No transactions found matching your criteria.
+        </div>
+      `;
+    } else {
+      filtered.forEach(tx => {
+        let iconClass = 'credit';
+        let iconName = 'arrow-down-to-line';
+        if (tx.type === 'debit') {
+          iconClass = 'debit';
+          iconName = 'arrow-up-from-line';
+        }
+        if (tx.status === 'pending') {
+          iconClass = 'pending';
+          iconName = 'clock';
+        }
+
+        let badgeClass = 'success';
+        if (tx.status === 'pending') badgeClass = 'pending';
+        if (tx.status === 'failed') badgeClass = 'failed';
+
+        let amountClass = tx.type === 'credit' ? 'credit' : 'debit';
+        if (tx.status === 'failed') amountClass = 'failed';
+        
+        let amountPrefix = tx.type === 'credit' ? '+' : '-';
+        if (tx.status === 'failed') amountPrefix = '';
+
+        const el = document.createElement('div');
+        el.className = 'tx-item';
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.onclick = () => openDrawer(tx);
+        
+        el.innerHTML = `
+          <div class="tx-left">
+            <div class="tx-icon ${iconClass}">
+              <i data-lucide="${iconName}"></i>
+            </div>
+            <div class="tx-details">
+              <span class="tx-name">${tx.name}</span>
+              <span class="tx-category">${tx.category}</span>
+              <span class="tx-reference">${tx.reference}</span>
+            </div>
+          </div>
+          <div class="tx-right">
+            <span class="tx-amount ${amountClass}">${amountPrefix}${tx.amount}</span>
+            <span class="tx-date">${tx.date}</span>
+            <span class="badge ${badgeClass}">${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}</span>
+          </div>
+        `;
+        
+        // Add keyboard support
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDrawer(tx);
+          }
+        });
+
+        txListEl.appendChild(el);
+      });
+    }
+
+    lucide.createIcons();
+    
+    // Update pagination text
+    const paginationText = document.getElementById('paginationText');
+    paginationText.textContent = `Showing 1–${filtered.length} of ${filtered.length} transactions`;
+  }
+
+  // Event Listeners for Filters
+  searchInput.addEventListener('input', () => {
+    // debounce slightly
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(renderTransactions, 300);
+  });
+  
+  typeFilter.addEventListener('change', renderTransactions);
+  statusFilter.addEventListener('change', renderTransactions);
+
+  // Initial render
+  renderTransactions();
+
+</script>
+</body>
+</html>

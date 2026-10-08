@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GEN C Dashboard — your financial overview at a glance." />
+  <title>Dashboard — GEN C</title>
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="assets/css/design-system.css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ============================================================
+       DASHBOARD — page-specific styles
+       ============================================================ */
+
+    /* ── Skip link ─────────────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: var(--space-4);
+      z-index: 9999;
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      text-decoration: none;
+      transition: top var(--transition-fast);
+    }
+    .skip-link:focus {
+      top: var(--space-4);
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+
+    /* ── App shell ──────────────────────────────────────────── */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg);
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────── */
+    .sidebar {
+      width: 256px;
+      flex-shrink: 0;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-border) transparent;
+      z-index: 100;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+    /* Logo */
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-6) var(--space-5);
+      text-decoration: none;
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .sidebar-logo:hover { text-decoration: none; }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-mark span {
+      color: #fff;
+      font-size: 1.125rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .logo-wordmark {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      color: var(--color-text);
+      letter-spacing: -0.5px;
+    }
+    .logo-wordmark em {
+      font-style: normal;
+      color: var(--color-primary);
+    }
+
+    /* Nav sections */
+    .sidebar-nav {
+      flex: 1;
+      padding: var(--space-4) 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-section {
+      padding: 0 var(--space-3);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0.625rem var(--space-3);
+      border-radius: var(--radius-md);
+      color: var(--color-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      text-decoration: none;
+      transition: background var(--transition-fast), color var(--transition-fast);
+      position: relative;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover:not(.nav-item--disabled) {
+      background: var(--color-bg);
+      color: var(--color-text);
+      text-decoration: none;
+    }
+    .nav-item:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+    .nav-item--active {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    .nav-item--active:hover {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+    .nav-item--active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--color-primary);
+      border-radius: 0 3px 3px 0;
+      margin-left: calc(-1 * var(--space-3));
+    }
+    .nav-item--disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .nav-item [data-lucide] {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      stroke-width: 2;
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--color-border);
+      margin: var(--space-4) var(--space-5);
+    }
+
+    .sidebar-bottom {
+      padding: 0 var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    /* User area at bottom of sidebar */
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-3);
+      margin: 0 0 0;
+      border-top: 1px solid var(--color-border);
+      margin-top: var(--space-2);
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+    .sidebar-user-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .sidebar-user-name {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-user-email {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Mobile top header ───────────────────────────────────── */
+    .mobile-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .mobile-header-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      text-decoration: none;
+    }
+    .mobile-header-logo:hover { text-decoration: none; }
+    .mobile-header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      color: var(--color-muted);
+      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+      position: relative;
+    }
+    .icon-btn:hover {
+      background: var(--color-bg);
+      color: var(--color-text);
+      border-color: var(--color-border-hover);
+    }
+    .icon-btn:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+    .icon-btn [data-lucide] {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+    .notif-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      background: var(--color-error);
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--color-surface);
+    }
+
+    /* ── Mobile bottom nav ─────────────────────────────────── */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 90;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-2) 0;
+      padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
+    }
+    .bottom-nav-list {
+      display: flex;
+      list-style: none;
+      justify-content: space-around;
+    }
+    .bottom-nav-item {
+      flex: 1;
+    }
+    .bottom-nav-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: var(--space-2) var(--space-1);
+      text-decoration: none;
+      color: var(--color-muted);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      transition: color var(--transition-fast);
+    }
+    .bottom-nav-link [data-lucide] {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+    .bottom-nav-link:hover { color: var(--color-text); text-decoration: none; }
+    .bottom-nav-link--active {
+      color: var(--color-primary);
+    }
+    .bottom-nav-link--active [data-lucide] {
+      stroke-width: 2.5;
+    }
+
+    /* ── Main content ────────────────────────────────────────── */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-inner {
+      padding: var(--space-8) var(--space-8);
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+
+    /* ── Greeting row ────────────────────────────────────────── */
+    .greeting-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+    .greeting-text h1 {
+      font-size: var(--font-size-2xl);
+      font-weight: 600;
+      color: var(--color-text);
+      line-height: 1.3;
+      margin-bottom: var(--space-1);
+    }
+    .greeting-sub {
+      font-size: var(--font-size-sm);
+      color: var(--color-muted);
+    }
+    .greeting-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-shrink: 0;
+    }
+    .greeting-avatar {
+      width: 40px;
+      height: 40px;
+      font-size: var(--font-size-sm);
+    }
+
+    /* ── Balance card ────────────────────────────────────────── */
+    .balance-card {
+      background: var(--color-dark-navy);
+      border-radius: 20px;
+      padding: var(--space-8);
+      position: relative;
+      overflow: hidden;
+      /* Subtle diagonal line texture */
+      background-image:
+        repeating-linear-gradient(
+          -45deg,
+          rgba(255,255,255,0.018) 0px,
+          rgba(255,255,255,0.018) 1px,
+          transparent 1px,
+          transparent 14px
+        );
+    }
+
+    /* Decorative blobs */
+    .balance-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(37,99,235,0.28) 0%, transparent 70%);
+      border-radius: var(--radius-full);
+      pointer-events: none;
+    }
+    .balance-card::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: 40px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(37,99,235,0.14) 0%, transparent 70%);
+      border-radius: var(--radius-full);
+      pointer-events: none;
+    }
+
+    .balance-card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .balance-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .balance-label {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+    }
+    .balance-eye-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255,255,255,0.8);
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .balance-eye-btn:hover {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+    }
+    .balance-eye-btn:focus-visible {
+      outline: 2px solid rgba(255,255,255,0.7);
+      outline-offset: 2px;
+    }
+    .balance-eye-btn [data-lucide] {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+    }
+
+    .balance-amount {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      margin-bottom: var(--space-3);
+    }
+
+    .balance-usd-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-full);
+      padding: 3px 10px;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: var(--space-2);
+    }
+
+    .balance-equiv {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.45);
+      font-style: italic;
+      margin-bottom: var(--space-6);
+    }
+
+    .balance-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin-bottom: var(--space-5);
+    }
+
+    .balance-sub-rows {
+      display: flex;
+      gap: var(--space-8);
+    }
+    .balance-sub-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .balance-sub-label {
+      font-size: var(--font-size-xs);
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+    }
+    .balance-sub-amount {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ── Quick actions ───────────────────────────────────────── */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+    }
+    .quick-action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-2);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+      color: var(--color-text);
+    }
+    .quick-action-btn:hover {
+      background: var(--color-bg);
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      text-decoration: none;
+      color: var(--color-text);
+    }
+    .quick-action-btn:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+    .quick-action-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+      flex-shrink: 0;
+      transition: background var(--transition-fast);
+    }
+    .quick-action-btn:hover .quick-action-icon {
+      background: #DBEAFE;
+    }
+    .quick-action-icon [data-lucide] {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+    .quick-action-label {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    /* ── Two-column layout ─────────────────────────────────── */
+    .two-col-section {
+      display: grid;
+      grid-template-columns: 60fr 40fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    /* Section header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .section-header h2 {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .view-all-link {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    .view-all-link:hover {
+      text-decoration: underline;
+      color: var(--color-primary-hover);
+    }
+
+    /* Card base */
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Transactions list ───────────────────────────────────── */
+    .txn-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .txn-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .txn-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .txn-item:first-child {
+      padding-top: 0;
+    }
+
+    .txn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .txn-icon--credit {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+    .txn-icon--debit {
+      background: var(--color-error-light);
+      color: var(--color-error);
+    }
+    .txn-icon--pending {
+      background: #FFFBEB;
+      color: #D97706;
+    }
+    .txn-icon [data-lucide] {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2.2;
+    }
+
+    .txn-details {
+      flex: 1;
+      min-width: 0;
+    }
+    .txn-name {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .txn-meta {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .txn-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .txn-amount {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .txn-amount--credit { color: var(--color-success); }
+    .txn-amount--debit  { color: var(--color-text); }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .badge [data-lucide] {
+      width: 10px;
+      height: 10px;
+      stroke-width: 2.5;
+    }
+    .badge--success {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+    .badge--pending {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .badge--error {
+      background: var(--color-error-light);
+      color: var(--color-error);
+    }
+
+    /* ── Savings card ────────────────────────────────────────── */
+    .savings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .savings-header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .savings-header h2 {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .savings-header [data-lucide] {
+      width: 18px;
+      height: 18px;
+      color: var(--color-primary);
+      stroke-width: 2;
+    }
+
+    .savings-balance {
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      margin-bottom: var(--space-1);
+    }
+    .savings-interest {
+      font-size: var(--font-size-xs);
+      color: var(--color-success);
+      font-weight: 600;
+      margin-bottom: var(--space-4);
+    }
+
+    .progress-bar-track {
+      height: 8px;
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: var(--space-2);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: var(--radius-full);
+      transition: width var(--transition-slow);
+    }
+    .progress-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted);
+      margin-bottom: var(--space-5);
+    }
+
+    .btn-sm {
+      padding: 0.4375rem var(--space-4);
+      font-size: var(--font-size-xs);
+      border-radius: var(--radius-md);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--color-primary);
+      border: 1.5px solid var(--color-primary);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--transition-fast), color var(--transition-fast);
+      line-height: 1.5;
+    }
+    .btn-outline:hover {
+      background: var(--color-primary-light);
+      text-decoration: none;
+      color: var(--color-primary-hover);
+    }
+    .btn-outline:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    /* ── Account status card ─────────────────────────────────── */
+    .account-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .account-header h2 {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .account-name {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-3);
+    }
+
+    .account-number-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .account-number {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--color-text);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.03em;
+    }
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--color-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+    .copy-btn:hover {
+      background: var(--color-bg);
+      color: var(--color-text);
+      border-color: var(--color-border-hover);
+    }
+    .copy-btn:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+    .copy-btn [data-lucide] {
+      width: 13px;
+      height: 13px;
+      stroke-width: 2;
+    }
+
+    .account-status-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+    .status-dot--active { background: var(--color-success); }
+    .account-status-note {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted);
+    }
+
+    /* ── Monthly overview ────────────────────────────────────── */
+    .monthly-overview {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .monthly-overview h2 {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .monthly-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .stat-icon--in {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+    .stat-icon--out {
+      background: var(--color-error-light);
+      color: var(--color-error);
+    }
+    .stat-icon--pending {
+      background: #FFFBEB;
+      color: #D97706;
+    }
+    .stat-icon [data-lucide] {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      color: var(--color-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-1);
+    }
+    .stat-amount {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+    .stat-sub {
+      font-size: var(--font-size-xs);
+      color: var(--color-muted);
+    }
+
+    /* ── Hidden balance state ────────────────────────────────── */
+    .balance-hidden { display: none !important; }
+    .balance-visible { display: inline !important; }
+
+    /* Balance amounts toggle */
+    .bal-show { display: inline; }
+    .bal-hide { display: none; }
+    body.balance-masked .bal-show { display: none; }
+    body.balance-masked .bal-hide { display: inline; }
+
+    /* ── Responsive: tablet / mobile ──────────────────────────── */
+    @media (max-width: 1100px) {
+      .two-col-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .monthly-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 767px) {
+      .sidebar { display: none; }
+      .mobile-header { display: flex; }
+      .mobile-bottom-nav { display: flex; }
+
+      .greeting-actions { display: none; }
+
+      .dashboard-inner {
+        padding: var(--space-5) var(--space-4);
+        padding-bottom: calc(80px + var(--space-5));
+        gap: var(--space-6);
+      }
+
+      .balance-card {
+        padding: var(--space-6) var(--space-5);
+      }
+
+      .balance-amount {
+        font-size: clamp(1.75rem, 8vw, 2.5rem);
+      }
+
+      .quick-actions {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-3);
+      }
+      .quick-action-btn {
+        padding: var(--space-3) var(--space-1);
+        border-radius: var(--radius-lg);
+      }
+      .quick-action-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .two-col-section {
+        grid-template-columns: 1fr;
+      }
+
+      .monthly-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-3);
+      }
+      .stat-card {
+        padding: var(--space-4);
+      }
+      .stat-amount {
+        font-size: var(--font-size-base);
+      }
+    }
+
+    @media (max-width: 420px) {
+      .monthly-stats {
+        grid-template-columns: 1fr;
+      }
+      .quick-actions {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-2);
+      }
+      .quick-action-label {
+        font-size: 0.6rem;
+      }
+      .balance-sub-rows {
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+    }
+
+    /* ── Copied tooltip ──────────────────────────────────────── */
+    .copy-tooltip {
+      position: relative;
+    }
+    .copy-feedback {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-text);
+      color: #fff;
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      margin-bottom: 6px;
+      transition: opacity var(--transition-fast);
+    }
+    .copy-feedback::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--color-text);
+    }
+    .copy-feedback.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ════════════════════════════════════════════════════════
+       APP SHELL
+  ════════════════════════════════════════════════════════ -->
+  <div class="app-shell">
+
+    <!-- ── Sidebar (desktop) ─────────────────────────────────── -->
+    <aside class="sidebar" aria-label="Main navigation">
+
+      <!-- Logo -->
+      <a href="dashboard.html" class="sidebar-logo" aria-label="GEN C — go to dashboard">
+        <div class="logo-mark" aria-hidden="true">
+          <span>G</span>
+        </div>
+        <span class="logo-wordmark">GEN <em>C</em></span>
+      </a>
+
+      <!-- Primary nav -->
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <div class="nav-section">
+
+          <a href="dashboard.html" class="nav-item nav-item--active" aria-current="page">
+            <i data-lucide="layout-dashboard" aria-hidden="true"></i>
+            Dashboard
+          </a>
+
+          <a href="accounts.html" class="nav-item">
+            <i data-lucide="wallet" aria-hidden="true"></i>
+            Accounts
+          </a>
+
+          <a href="transactions.html" class="nav-item">
+            <i data-lucide="receipt" aria-hidden="true"></i>
+            Transactions
+          </a>
+
+          <a href="#" class="nav-item nav-item--disabled" aria-disabled="true" tabindex="-1">
+            <i data-lucide="arrow-up-from-line" aria-hidden="true"></i>
+            Send
+          </a>
+
+          <a href="#" class="nav-item nav-item--disabled" aria-disabled="true" tabindex="-1">
+            <i data-lucide="arrow-down-to-line" aria-hidden="true"></i>
+            Receive
+          </a>
+
+          <a href="#" class="nav-item nav-item--disabled" aria-disabled="true" tabindex="-1">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i>
+            Exchange
+          </a>
+
+          <a href="#" class="nav-item nav-item--disabled" aria-disabled="true" tabindex="-1">
+            <i data-lucide="piggy-bank" aria-hidden="true"></i>
+            Savings
+          </a>
+
+        </div>
+
+        <!-- Divider -->
+        <div class="sidebar-divider" role="separator"></div>
+
+        <!-- Bottom nav items -->
+        <div class="sidebar-bottom">
+
+          <a href="#" class="nav-item">
+            <i data-lucide="user" aria-hidden="true"></i>
+            Profile
+          </a>
+
+          <a href="#" class="nav-item">
+            <i data-lucide="settings" aria-hidden="true"></i>
+            Settings
+          </a>
+
+          <a href="index.html" class="nav-item">
+            <i data-lucide="log-out" aria-hidden="true"></i>
+            Log out
+          </a>
+
+        </div>
+      </nav>
+
+      <!-- User area -->
+      <div class="sidebar-user" aria-label="Signed in as Lucky Weng">
+        <div class="avatar" aria-hidden="true">LW</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Lucky Weng</div>
+          <div class="sidebar-user-email">lucky@genc.app</div>
+        </div>
+      </div>
+
+    </aside>
+    <!-- /Sidebar -->
+
+    <!-- ── Main content area ─────────────────────────────────── -->
+    <div class="main-content">
+
+      <!-- Mobile top header -->
+      <header class="mobile-header" role="banner" aria-label="GEN C mobile header">
+        <a href="dashboard.html" class="mobile-header-logo" aria-label="GEN C — home">
+          <div class="logo-mark" aria-hidden="true" style="width:30px;height:30px;">
+            <span style="font-size:0.9rem;">G</span>
+          </div>
+          <span class="logo-wordmark" style="font-size:var(--font-size-lg);">GEN <em>C</em></span>
+        </a>
+        <div class="mobile-header-actions">
+          <button class="icon-btn" aria-label="Notifications — 1 unread">
+            <i data-lucide="bell" aria-hidden="true"></i>
+            <span class="notif-dot" aria-hidden="true"></span>
+          </button>
+          <div class="avatar" style="width:32px;height:32px;font-size:0.6875rem;" aria-hidden="true">LW</div>
+        </div>
+      </header>
+
+      <!-- Dashboard main -->
+      <main id="main-content" class="dashboard-inner" aria-label="Dashboard">
+
+        <!-- ── 1. GREETING ROW ─────────────────────────────── -->
+        <div class="greeting-row">
+          <div class="greeting-text">
+            <h1 id="greeting-heading">Good evening, Lucky</h1>
+            <p class="greeting-sub" id="greeting-date">Thursday, 8 October 2026</p>
+          </div>
+          <div class="greeting-actions" aria-hidden="true">
+            <button class="icon-btn" aria-label="Notifications" aria-hidden="false">
+              <i data-lucide="bell" aria-hidden="true"></i>
+              <span class="notif-dot" aria-hidden="true"></span>
+            </button>
+            <div class="avatar greeting-avatar">LW</div>
+          </div>
+        </div>
+
+        <!-- ── 2. BALANCE CARD ─────────────────────────────── -->
+        <section aria-labelledby="balance-heading">
+          <div class="balance-card" role="region" aria-label="Total balance overview">
+            <div class="balance-card-inner">
+
+              <!-- Top row -->
+              <div class="balance-top-row">
+                <span class="balance-label" id="balance-heading">Total Balance</span>
+                <button
+                  class="balance-eye-btn"
+                  id="balance-toggle"
+                  aria-label="Hide balance"
+                  aria-pressed="false"
+                  title="Toggle balance visibility"
+                >
+                  <i data-lucide="eye" aria-hidden="true" id="eye-icon"></i>
+                </button>
+              </div>
+
+              <!-- Main NGN amount -->
+              <div class="balance-amount" aria-live="polite" aria-atomic="true">
+                <span class="bal-show" aria-label="Two hundred and fifty thousand naira">₦250,000.00</span>
+                <span class="bal-hide" aria-label="Balance hidden">₦•••,•••.••</span>
+              </div>
+
+              <!-- USD pill -->
+              <div class="balance-usd-pill" aria-live="polite">
+                <span>+</span>
+                <span class="bal-show">$500.00 USD</span>
+                <span class="bal-hide">$•••.•• USD</span>
+              </div>
+
+              <!-- USD equivalent -->
+              <p class="balance-equiv" aria-live="polite">
+                ≈ <span class="bal-show">$660.42 USD equivalent</span><span class="bal-hide">••• USD equivalent</span>
+              </p>
+
+              <!-- Divider -->
+              <div class="balance-divider" aria-hidden="true"></div>
+
+              <!-- Sub-balances -->
+              <div class="balance-sub-rows">
+                <div class="balance-sub-row">
+                  <span class="balance-sub-label">NGN Balance</span>
+                  <span class="balance-sub-amount" aria-live="polite">
+                    <span class="bal-show">₦250,000.00</span>
+                    <span class="bal-hide">₦•••,•••.••</span>
+                  </span>
+                </div>
+                <div class="balance-sub-row">
+                  <span class="balance-sub-label">USD Balance</span>
+                  <span class="balance-sub-amount" aria-live="polite">
+                    <span class="bal-show">$500.00</span>
+                    <span class="bal-hide">$•••.••</span>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 3. QUICK ACTIONS ───────────────────────────── -->
+        <section aria-label="Quick actions">
+          <div class="quick-actions" role="list">
+
+            <a href="#" class="quick-action-btn" role="listitem" aria-label="Fund your account">
+              <div class="quick-action-icon" aria-hidden="true">
+                <i data-lucide="arrow-down-to-line" aria-hidden="true"></i>
+              </div>
+              <span class="quick-action-label">Fund</span>
+            </a>
+
+            <a href="#" class="quick-action-btn" role="listitem" aria-label="Send money">
+              <div class="quick-action-icon" aria-hidden="true">
+                <i data-lucide="arrow-up-from-line" aria-hidden="true"></i>
+              </div>
+              <span class="quick-action-label">Send</span>
+            </a>
+
+            <a href="#" class="quick-action-btn" role="listitem" aria-label="Receive money — show QR code">
+              <div class="quick-action-icon" aria-hidden="true">
+                <i data-lucide="qr-code" aria-hidden="true"></i>
+              </div>
+              <span class="quick-action-label">Receive</span>
+            </a>
+
+            <a href="#" class="quick-action-btn" role="listitem" aria-label="Exchange currency">
+              <div class="quick-action-icon" aria-hidden="true">
+                <i data-lucide="refresh-cw" aria-hidden="true"></i>
+              </div>
+              <span class="quick-action-label">Exchange</span>
+            </a>
+
+          </div>
+        </section>
+
+        <!-- ── 4. TWO-COLUMN SECTION ──────────────────────── -->
+        <div class="two-col-section">
+
+          <!-- LEFT: Recent Transactions -->
+          <section aria-labelledby="txn-heading">
+            <div class="section-header">
+              <h2 id="txn-heading">Recent Transactions</h2>
+              <a href="transactions.html" class="view-all-link" aria-label="View all transactions">View all</a>
+            </div>
+
+            <div class="card" style="padding: var(--space-4) var(--space-5);">
+              <ul class="txn-list" aria-label="Recent transactions list" role="list">
+
+                <!-- 1. Zara Online — Debit — Success -->
+                <li class="txn-item" role="listitem">
+                  <div class="txn-icon txn-icon--debit" aria-hidden="true">
+                    <i data-lucide="shopping-bag" aria-hidden="true"></i>
+                  </div>
+                  <div class="txn-details">
+                    <div class="txn-name">Zara Online</div>
+                    <div class="txn-meta">Shopping &middot; Oct 7, 2026</div>
+                  </div>
+                  <div class="txn-right">
+                    <span class="txn-amount txn-amount--debit" aria-label="Debit twelve thousand five hundred naira">
+                      <span class="bal-show">−₦12,500.00</span>
+                      <span class="bal-hide">−₦•••.••</span>
+                    </span>
+                    <span class="badge badge--success">
+                      <i data-lucide="check-circle" aria-hidden="true"></i>
+                      Success
+                    </span>
+                  </div>
+                </li>
+
+                <!-- 2. Amara Okafor — Credit — Success -->
+                <li class="txn-item" role="listitem">
+                  <div class="txn-icon txn-icon--credit" aria-hidden="true">
+                    <i data-lucide="arrow-down-left" aria-hidden="true"></i>
+                  </div>
+                  <div class="txn-details">
+                    <div class="txn-name">Amara Okafor</div>
+                    <div class="txn-meta">GEN C Transfer &middot; Oct 7, 2026</div>
+                  </div>
+                  <div class="txn-right">
+                    <span class="txn-amount txn-amount--credit" aria-label="Credit fifty thousand naira">
+                      <span class="bal-show">+₦50,000.00</span>
+                      <span class="bal-hide">+₦•••,•••.••</span>
+                    </span>
+                    <span class="badge badge--success">
+                      <i data-lucide="check-circle" aria-hidden="true"></i>
+                      Success
+                    </span>
+                  </div>
+                </li>
+
+                <!-- 3. Bolt — Debit — Success -->
+                <li class="txn-item" role="listitem">
+                  <div class="txn-icon txn-icon--debit" aria-hidden="true">
+                    <i data-lucide="car" aria-hidden="true"></i>
+                  </div>
+                  <div class="txn-details">
+                    <div class="txn-name">Bolt</div>
+                    <div class="txn-meta">Transport &middot; Oct 6, 2026</div>
+                  </div>
+                  <div class="txn-right">
+                    <span class="txn-amount txn-amount--debit" aria-label="Debit three thousand two hundred naira">
+                      <span class="bal-show">−₦3,200.00</span>
+                      <span class="bal-hide">−₦•••.••</span>
+                    </span>
+                    <span class="badge badge--success">
+                      <i data-lucide="check-circle" aria-hidden="true"></i>
+                      Success
+                    </span>
+                  </div>
+                </li>
+
+                <!-- 4. Kwik Delivery — Debit — Pending -->
+                <li class="txn-item" role="listitem">
+                  <div class="txn-icon txn-icon--pending" aria-hidden="true">
+                    <i data-lucide="clock" aria-hidden="true"></i>
+                  </div>
+                  <div class="txn-details">
+                    <div class="txn-name">Kwik Delivery</div>
+                    <div class="txn-meta">Logistics &middot; Oct 6, 2026</div>
+                  </div>
+                  <div class="txn-right">
+                    <span class="txn-amount txn-amount--debit" aria-label="Debit five thousand naira pending">
+                      <span class="bal-show">−₦5,000.00</span>
+                      <span class="bal-hide">−₦•••,•••.••</span>
+                    </span>
+                    <span class="badge badge--pending">
+                      <i data-lucide="clock" aria-hidden="true"></i>
+                      Pending
+                    </span>
+                  </div>
+                </li>
+
+                <!-- 5. USD Deposit — Credit — Success -->
+                <li class="txn-item" role="listitem">
+                  <div class="txn-icon txn-icon--credit" aria-hidden="true">
+                    <i data-lucide="dollar-sign" aria-hidden="true"></i>
+                  </div>
+                  <div class="txn-details">
+                    <div class="txn-name">USD Deposit</div>
+                    <div class="txn-meta">Wallet Funding &middot; Oct 5, 2026</div>
+                  </div>
+                  <div class="txn-right">
+                    <span class="txn-amount txn-amount--credit" aria-label="Credit one hundred US dollars">
+                      <span class="bal-show">+$100.00</span>
+                      <span class="bal-hide">+$•••.••</span>
+                    </span>
+                    <span class="badge badge--success">
+                      <i data-lucide="check-circle" aria-hidden="true"></i>
+                      Success
+                    </span>
+                  </div>
+                </li>
+
+                <!-- 6. Chibuike Eze — Debit — Success -->
+                <li class="txn-item" role="listitem">
+                  <div class="txn-icon txn-icon--debit" aria-hidden="true">
+                    <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+                  </div>
+                  <div class="txn-details">
+                    <div class="txn-name">Chibuike Eze</div>
+                    <div class="txn-meta">GEN C Transfer &middot; Oct 4, 2026</div>
+                  </div>
+                  <div class="txn-right">
+                    <span class="txn-amount txn-amount--debit" aria-label="Debit thirty thousand naira">
+                      <span class="bal-show">−₦30,000.00</span>
+                      <span class="bal-hide">−₦••,•••.••</span>
+                    </span>
+                    <span class="badge badge--success">
+                      <i data-lucide="check-circle" aria-hidden="true"></i>
+                      Success
+                    </span>
+                  </div>
+                </li>
+
+              </ul>
+            </div>
+          </section>
+
+          <!-- RIGHT COLUMN -->
+          <div class="right-col">
+
+            <!-- Savings summary card -->
+            <section aria-labelledby="savings-heading">
+              <div class="card">
+                <div class="savings-header">
+                  <div class="savings-header-left">
+                    <h2 id="savings-heading">My Savings</h2>
+                    <i data-lucide="piggy-bank" aria-hidden="true"></i>
+                  </div>
+                </div>
+
+                <div class="savings-balance" aria-live="polite">
+                  <span class="bal-show">₦75,000.00</span>
+                  <span class="bal-hide">₦•••,•••.••</span>
+                </div>
+
+                <p class="savings-interest" aria-live="polite">
+                  <span class="bal-show">Interest earned: +₦892.50</span>
+                  <span class="bal-hide">Interest earned: +₦•••.••</span>
+                </p>
+
+                <div class="progress-bar-track" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-label="Savings goal progress: 60%">
+                  <div class="progress-bar-fill" style="width: 60%;"></div>
+                </div>
+                <p class="progress-label" aria-live="polite">
+                  <span class="bal-show">₦75,000 of ₦125,000 goal</span>
+                  <span class="bal-hide">₦•••,••• of ₦•••,••• goal</span>
+                </p>
+
+                <a href="#" class="btn-outline btn-sm" aria-label="View savings details">
+                  View Savings
+                </a>
+              </div>
+            </section>
+
+            <!-- Account status card -->
+            <section aria-labelledby="account-heading">
+              <div class="card">
+                <div class="account-header">
+                  <h2 id="account-heading">Account</h2>
+                  <span class="badge badge--success" aria-label="Account is active and verified">
+                    <i data-lucide="shield-check" aria-hidden="true"></i>
+                    Verified
+                  </span>
+                </div>
+
+                <p class="account-name">Lucky Weng</p>
+
+                <div class="account-number-row">
+                  <span class="account-number" id="account-number-display">1029 •••• 4756</span>
+                  <div class="copy-tooltip">
+                    <button
+                      class="copy-btn"
+                      id="copy-acct-btn"
+                      aria-label="Copy account number"
+                      title="Copy account number"
+                    >
+                      <i data-lucide="copy" aria-hidden="true"></i>
+                    </button>
+                    <span class="copy-feedback" id="copy-feedback" role="status" aria-live="polite">Copied!</span>
+                  </div>
+                </div>
+
+                <div class="account-status-row">
+                  <div class="status-dot status-dot--active" aria-hidden="true"></div>
+                  <span class="badge badge--success" style="font-size: var(--font-size-xs);">Active</span>
+                </div>
+
+                <p class="account-status-note">Your account is active and verified.</p>
+              </div>
+            </section>
+
+          </div>
+          <!-- /right col -->
+
+        </div>
+        <!-- /two-column -->
+
+        <!-- ── 5. MONTHLY OVERVIEW ────────────────────────── -->
+        <section class="monthly-overview" aria-labelledby="monthly-heading">
+          <h2 id="monthly-heading">This Month</h2>
+
+          <div class="monthly-stats" role="list" aria-label="Monthly financial summary">
+
+            <!-- Money In -->
+            <div class="stat-card" role="listitem">
+              <div class="stat-icon stat-icon--in" aria-hidden="true">
+                <i data-lucide="arrow-down-to-line" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="stat-label">Money In</div>
+                <div class="stat-amount" aria-live="polite">
+                  <span class="bal-show">₦175,000.00</span>
+                  <span class="bal-hide">₦•••,•••.••</span>
+                </div>
+                <div class="stat-sub">Oct 2026</div>
+              </div>
+            </div>
+
+            <!-- Money Out -->
+            <div class="stat-card" role="listitem">
+              <div class="stat-icon stat-icon--out" aria-hidden="true">
+                <i data-lucide="arrow-up-from-line" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="stat-label">Money Out</div>
+                <div class="stat-amount" aria-live="polite">
+                  <span class="bal-show">₦98,500.00</span>
+                  <span class="bal-hide">₦•••,•••.••</span>
+                </div>
+                <div class="stat-sub">Oct 2026</div>
+              </div>
+            </div>
+
+            <!-- Pending -->
+            <div class="stat-card" role="listitem">
+              <div class="stat-icon stat-icon--pending" aria-hidden="true">
+                <i data-lucide="clock" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="stat-label">Pending</div>
+                <div class="stat-amount" aria-live="polite">
+                  <span class="bal-show">₦5,000.00</span>
+                  <span class="bal-hide">₦•••,•••.••</span>
+                </div>
+                <div class="stat-sub">1 transaction</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+      <!-- /main -->
+
+      <!-- Mobile bottom nav -->
+      <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+        <ul class="bottom-nav-list" role="list">
+
+          <li class="bottom-nav-item" role="listitem">
+            <a href="dashboard.html" class="bottom-nav-link bottom-nav-link--active" aria-current="page" aria-label="Dashboard — current page">
+              <i data-lucide="layout-dashboard" aria-hidden="true"></i>
+              <span>Home</span>
+            </a>
+          </li>
+
+          <li class="bottom-nav-item" role="listitem">
+            <a href="accounts.html" class="bottom-nav-link" aria-label="Accounts">
+              <i data-lucide="wallet" aria-hidden="true"></i>
+              <span>Accounts</span>
+            </a>
+          </li>
+
+          <li class="bottom-nav-item" role="listitem">
+            <a href="transactions.html" class="bottom-nav-link" aria-label="Transactions">
+              <i data-lucide="receipt" aria-hidden="true"></i>
+              <span>Transactions</span>
+            </a>
+          </li>
+
+          <li class="bottom-nav-item" role="listitem">
+            <a href="#" class="bottom-nav-link" aria-label="More options">
+              <i data-lucide="more-horizontal" aria-hidden="true"></i>
+              <span>More</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+
+    </div>
+    <!-- /main-content -->
+
+  </div>
+  <!-- /app-shell -->
+
+  <!-- ════════════════════════════════════════════════════════
+       JAVASCRIPT
+  ════════════════════════════════════════════════════════ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ── Init Lucide icons ──────────────────────────────────
+      lucide.createIcons();
+
+      // ── Greeting & Date ───────────────────────────────────
+      (function setGreeting() {
+        var now  = new Date();
+        var hour = now.getHours();
+        var greeting;
+
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Good morning';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Good afternoon';
+        } else {
+          greeting = 'Good evening';
+        }
+
+        var headingEl = document.getElementById('greeting-heading');
+        if (headingEl) {
+          headingEl.textContent = greeting + ', Lucky';
+        }
+
+        var dateEl = document.getElementById('greeting-date');
+        if (dateEl) {
+          var days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+          var months = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+          var dayName   = days[now.getDay()];
+          var date      = now.getDate();
+          var monthName = months[now.getMonth()];
+          var year      = now.getFullYear();
+
+          // Ordinal suffix
+          var suffix = 'th';
+          if (date === 1 || date === 21 || date === 31) suffix = 'st';
+          else if (date === 2 || date === 22) suffix = 'nd';
+          else if (date === 3 || date === 23) suffix = 'rd';
+
+          dateEl.textContent = dayName + ', ' + date + ' ' + monthName + ' ' + year;
+        }
+      })();
+
+      // ── Balance visibility toggle ──────────────────────────
+      (function setupBalanceToggle() {
+        var toggleBtn = document.getElementById('balance-toggle');
+        var eyeIcon   = document.getElementById('eye-icon');
+        var isMasked  = false;
+
+        if (!toggleBtn) return;
+
+        toggleBtn.addEventListener('click', function () {
+          isMasked = !isMasked;
+
+          if (isMasked) {
+            document.body.classList.add('balance-masked');
+            toggleBtn.setAttribute('aria-label', 'Show balance');
+            toggleBtn.setAttribute('aria-pressed', 'true');
+            // Swap icon to eye-off
+            if (eyeIcon) {
+              eyeIcon.setAttribute('data-lucide', 'eye-off');
+              lucide.createIcons({ nodes: [eyeIcon] });
+            }
+          } else {
+            document.body.classList.remove('balance-masked');
+            toggleBtn.setAttribute('aria-label', 'Hide balance');
+            toggleBtn.setAttribute('aria-pressed', 'false');
+            // Swap icon back to eye
+            if (eyeIcon) {
+              eyeIcon.setAttribute('data-lucide', 'eye');
+              lucide.createIcons({ nodes: [eyeIcon] });
+            }
+          }
+        });
+      })();
+
+      // ── Copy account number ────────────────────────────────
+      (function setupCopyButton() {
+        var copyBtn      = document.getElementById('copy-acct-btn');
+        var copyFeedback = document.getElementById('copy-feedback');
+        var accountNum   = '10290004756'; // full account number (display shows masked)
+        var feedbackTimer;
+
+        if (!copyBtn || !copyFeedback) return;
+
+        copyBtn.addEventListener('click', function () {
+          // Use Clipboard API
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(accountNum).then(function () {
+              showFeedback();
+            }).catch(function () {
+              fallbackCopy(accountNum);
+            });
+          } else {
+            fallbackCopy(accountNum);
+          }
+        });
+
+        function showFeedback() {
+          clearTimeout(feedbackTimer);
+          copyFeedback.classList.add('show');
+          copyBtn.setAttribute('aria-label', 'Copied!');
+          feedbackTimer = setTimeout(function () {
+            copyFeedback.classList.remove('show');
+            copyBtn.setAttribute('aria-label', 'Copy account number');
+          }, 2000);
+        }
+
+        function fallbackCopy(text) {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          try {
+            document.execCommand('copy');
+            showFeedback();
+          } catch (e) {
+            console.warn('Copy failed:', e);
+          }
+          document.body.removeChild(ta);
+        }
+      })();
+
+    }); // end DOMContentLoaded
+  </script>
+
+</body>
+</html>
