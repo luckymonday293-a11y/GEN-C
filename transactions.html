@@ -1115,6 +1115,11 @@
 
   closeDrawer.addEventListener('click', closeTxDrawer);
   drawerOverlay.addEventListener('click', closeTxDrawer);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && txDrawer.classList.contains('open')) {
+      closeTxDrawer();
+    }
+  });
 
   // Transactions Data
   const transactions = [
